@@ -1,2 +1,5 @@
 # hadoop-hive
-Hadoop Hive Training by Venkata Bhattaram
+> (c) by Venkata Bhattaram
+
+* Hadoop Hive Training 
+

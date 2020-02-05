@@ -1,7 +1,7 @@
 ---
 Title: Apache Hive
-MetaKeywords: Apache Hive
-Author: (c) Venkata Bhattaram / tinitiate.com
+MetaKeywords: Apache Hive Tutorials
+Author: (c) Venkata Bhattaram | github.com/tinitiate
 ContentName: apache-hive
 ---
 

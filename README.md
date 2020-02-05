@@ -3,3 +3,5 @@
 
 * Hadoop Hive Training 
 
+For Training and Project Support contact **syntaxboard@gmail.com**  | 
+------------------------------------------------------------------- | 

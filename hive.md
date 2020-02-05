@@ -52,3 +52,5 @@ https://www.quora.com/How-do-I-insert-data-into-Hive-tables
 * Partitioning
 
 ***
+
+[^1]: (c) Venkata Bhattaram

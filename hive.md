@@ -53,4 +53,4 @@ https://www.quora.com/How-do-I-insert-data-into-Hive-tables
 
 ***
 
-[^1]: (c) Venkata Bhattaram
+(c) Venkata Bhattaram [^1]

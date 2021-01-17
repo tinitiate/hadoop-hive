@@ -10,13 +10,15 @@
 
 * The column on which the partition is created is called the **partition key**, partition on a column is done on a **LIST of values** of a partition key, such as Date or a Category of values.
 
+* **ALWAYS** choose a column, where the **cardinality** is **very low**, meaning, there are low number of repeating values.
+
 * Consider the below sales dataset.
 
-  ![Un-Partitioned Table](E:\code\HADOOP-TRAINING\CODING_HiveLabs\hive-basics\partition-basedata.png)
+  ![Un-Partitioned Table](E:\code\HADOOP_TRAINING\CODING_HiveLabs\hive-basics\partition-basedata.png)
 
 * The above can be **partitioned** on the **SaleDate** range, by **Month** values
 
-  ![hive partition](E:\code\HADOOP-TRAINING\CODING_HiveLabs\hive-basics\partition-keycol.png)
+  ![hive partition](E:\code\HADOOP_TRAINING\CODING_HiveLabs\hive-basics\partition-keycol.png)
 
 
 ##  
@@ -34,7 +36,12 @@
   drop table sales;
   
   -- Create Partitioned Table
-  create table sales (region string, product string, productcategory string, quantity integer) PARTITIONED BY(saledate date);
+  create table sales (
+      region           string
+     ,product          string
+     ,productcategory  string
+     ,quantity         integer
+  ) PARTITIONED BY (saledate date);
   
   -- Set Session Parameter to Non Strict
   -- This will enable Dynamic Partition creation and enable INSERTs,UPDATEs, DELETEs
@@ -68,23 +75,23 @@
   values ('EAST','B','SEA FOOD',300);
   insert into sales partition(saledate='2020-03-01')
   values ('WEST','B','SEA FOOD',100);
-  insert into sales partition(saledate='2020-03-01')
+insert into sales partition(saledate='2020-03-01')
   values ('SOUTH','C','PROCESSED FOOD',200);
   insert into sales partition(saledate='2020-03-01')
   values ('NORTH','C','PROCESSED FOOD',300);
   ```
-
+  
   ```sql
   -- Check data
   select * from sales;
   
   -- Show all partitions of Sales Table
-  SHOW PARTITIONS sales;
+SHOW PARTITIONS sales;
   
   -- Show specific Partition information of sales table
   DESCRIBE EXTENDED sales PARTITION (saledate='2020-01-01');
   ```
-
+  
   
 
 ## Creating Hive Static Partitioned Table
@@ -126,6 +133,26 @@
 
   
 
+## Check the folder details in Hadoop
+
+* Use the command below, to see the folder details of the table sales
+
+  ```bash
+  hadoop fs -ls /warehouse/tablespace/managed/hive/tinitiate.db/sales
+  # Results:
+  #[root@sandbox-hdp ~]# hadoop fs -ls #/warehouse/tablespace/managed/hive/tinitiate.db/sales
+  #Found 3 items
+  
+  #drwxr-xr-x+  - hive hadoop          0 2020-06-06 02:40 #/warehouse/tablespace/managed/hive/tinitiate.db/sales/saledate=2020-01-01
+  
+  #drwxr-xr-x+  - hive hadoop          0 2020-06-06 02:41 #/warehouse/tablespace/managed/hive/tinitiate.db/sales/saledate=2020-02-01
+  
+  #drwxr-xr-x+  - hive hadoop          0 2020-06-06 02:42 #/warehouse/tablespace/managed/hive/tinitiate.db/sales/saledate=2020-03-01
+  
+  ```
+
+  
+
 ## Drop Partition Command from Table
 
 * Partitions can be dropped using the `alter table drop partition clause`
@@ -143,20 +170,58 @@
 * To create a Range Partition, we must use a case statement to generate a pseudo column to use for the partition key column
 
   ```sql
-  create table emp_data (
-   emp_id int,
-   salary double
+  create table emp_data_part (
+     emp_id  int
+    ,salary  double
   )
   partitioned by (sal_range int);
   
   -- Create salary_range psuedo column
-  insert overwrite table emp_data partition (salary_range)   
+  insert overwrite table emp_data_part partition (salary_range)   
   select emp_id, salary,  
          case when salary between 1000 and 2000 then 2000
               when salary between 2001 and 3000 then 3000
               else 0 -- default partition
          end as sal_range 
   from emp_source;
+  ```
+
+
+
+
+## Partition over multiple columns
+
+```sql
+-- Create Cities table partition by Country, State, County
+-- -------------------------------------------------------
+create table cities ( city_id     int
+                     ,city_name   string)
+partitioned by ( country     string
+                ,state       string
+                ,county      string);
+
+-- Insert Data
+-- -------------------------------------------------------
+insert into cities partition( country='India'
+                             ,state='Maharastra'
+                             ,county='Mumbai') 
+values (1,'Mumbai');
+
+```
+
+
+
+* Check the Hadoop file system to see the folders of the partition
+
+  ```bash
+  hadoop fs -ls /warehouse/tablespace/managed/hive/tinitiate.db/cities
+  # drwxr-xr-x+  - hive hadoop          0 2020-06-07 16:20 /warehouse/tablespace/managed/hive/tinitiate.db/cities/country=India
+  
+  hadoop fs -ls /warehouse/tablespace/managed/hive/tinitiate.db/cities/country=India
+  # drwxr-xr-x+  - hive hadoop          0 2020-06-07 16:20 /warehouse/tablespace/managed/hive/tinitiate.db/cities/country=India/state=Maharastra
+  
+  hadoop fs -ls /warehouse/tablespace/managed/hive/tinitiate.db/cities/country=India/state=Maharastra
+  #drwxr-xr-x+  - hive hadoop          0 2020-06-07 16:21 /warehouse/tablespace/managed/hive/tinitiate.db/cities/country=India/state=Maharastra/county=Mumbai
   ```
 
   
